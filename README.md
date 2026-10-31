@@ -4,6 +4,22 @@
 The code LH2TS (for “LH2 Transfer Simulation”) enables to calculate the wasted H2 due to transfer and boil-off while using LH2 as a fuel for transportation. More specifically, a reduced lumped-parameter model simulates thermodynamic states in 2 vessels (one feeding, one receiving) using mass and energy balances for each control volume (vapor and liquid, in each vessel) and relying on 2-phase behavior and heat transfer models specific to cryogenic fluids (self consistent theory of dynamical condensation/evaporation – see references for details).
 This code was developed and tested using MATLAB R2013b and REFPROP DLL version 9.1 for parahydrogen [1], on a laptop PC running on 64-bit Windows 10 Enterprise (2016), with an Intel Core -7-6600U CPU @ 2.60 GHz and a 16.0 GB RAM.
 
+# Python port (CoolProp)
+
+A Python translation of the same trailer-to-dewar model lives in the `lh2transfer` package. Thermodynamic properties (density, energy, enthalpy, heat capacity, saturation) come from CoolProp's `ParaHydrogen` Helmholtz equation, which is the Leachman equation of state also used by REFPROP. CoolProp 6.6 does not include a parahydrogen viscosity model, and vapor thermal conductivity depends on it, so viscosity and the missing conductivities fall back to CoolProp `Hydrogen` at the same temperature and quality or pressure. The REFPROP polynomial fits in the MATLAB source (liquid temperature and density versus internal energy, latent heat, wall heat capacity, station heat leak, initial vapor temperature) are unchanged.
+
+Internal energy and enthalpy are J/kg, pressure is Pa, density is kg/m³. CoolProp's default `ParaHydrogen` reference state matches those polynomials (saturated liquid at 20 K is about -4.0 kJ/kg).
+
+Install the dependencies and run the nominal hour (3600 s) or the smoke tests:
+
+```bash
+pip install -r requirements.txt
+python -m lh2transfer.run_nominal --t-final 3600 --output output_bottomfill.txt
+python -m unittest discover -s tests -v
+```
+
+`requirements.txt` pins the scientific stack: `numpy`, `scipy`, and `CoolProp`. The eight smoke tests use the nominal-hour inputs from `inputs_TrailerToDewar.m` and integrate the opening of that transient. `output_bottomfill.txt` follows the column layout of `runNominal.m`.
+
 # Description of the files
 
 The simulation code consists of 9 MATLAB files that should be located in the same folder:
