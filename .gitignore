@@ -1,0 +1,6 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+output_bottomfill.txt
+*.egg-info/
+.venv/
